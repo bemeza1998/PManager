@@ -33,6 +33,8 @@ public class UsuarioMapper {
         .apellido(usuario.getApellido())
         .mail(usuario.getMail())
         .estado(usuario.getEstado())
+        .nombreJefatura(usuario.getJefatura().getNombre())
+        .nombrePerfil(usuario.getPerfil().getNombre())
         .build();
   }
 }

@@ -31,6 +31,7 @@ public class UsuarioResource {
   @GetMapping(path = "/estado/{estado}")
   public ResponseEntity<List<UsuarioDTO>> obtenerUsuarios(@PathVariable String estado) {
     List<Usuario> usuarios = this.service.obtenerUsuarios(estado);
+    System.out.println(usuarios);
     List<UsuarioDTO> usuariosDTO = new ArrayList<UsuarioDTO>();
     for (Usuario usuario : usuarios) {
       usuariosDTO.add(UsuarioMapper.buildUserDTO(usuario));
@@ -50,8 +51,15 @@ public class UsuarioResource {
   }
 
   @PutMapping
-  public ResponseEntity<Usuario> modificar(@RequestBody Usuario usuario) {
-    return ResponseEntity.ok(this.service.modificarEstado(usuario));
+  public ResponseEntity<UsuarioDTO> modificar(@RequestBody UsuarioDTO dto) {
+    Usuario usuario = this.service.modificar(UsuarioMapper.buildUser(dto));
+    return ResponseEntity.ok(UsuarioMapper.buildUserDTO(usuario));
+  }
+
+  @PatchMapping(path = "/estado")
+  public ResponseEntity<UsuarioDTO> modificarEstadoUsuario(@RequestBody UsuarioDTO dto) {
+    Usuario usuario = this.service.modificarEstado(UsuarioMapper.buildUser(dto));
+    return ResponseEntity.ok(UsuarioMapper.buildUserDTO(usuario));
   }
 
   @PutMapping(path = "/login")

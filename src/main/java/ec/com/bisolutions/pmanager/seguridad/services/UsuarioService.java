@@ -1,5 +1,8 @@
 package ec.com.bisolutions.pmanager.seguridad.services;
 
+import ec.com.bisolutions.pmanager.actividades.dao.JefaturaRepository;
+import ec.com.bisolutions.pmanager.actividades.model.Jefatura;
+import ec.com.bisolutions.pmanager.seguridad.dao.PerfilRepository;
 import ec.com.bisolutions.pmanager.seguridad.dao.RegistroSesionRepository;
 import ec.com.bisolutions.pmanager.seguridad.dao.UsuarioRepository;
 import ec.com.bisolutions.pmanager.seguridad.enums.EstadoRegistroSesionEnum;
@@ -8,10 +11,12 @@ import ec.com.bisolutions.pmanager.seguridad.exceptions.CambioClaveException;
 import ec.com.bisolutions.pmanager.seguridad.exceptions.CreateException;
 import ec.com.bisolutions.pmanager.seguridad.exceptions.LoginException;
 import ec.com.bisolutions.pmanager.seguridad.exceptions.NotFoundException;
+import ec.com.bisolutions.pmanager.seguridad.model.Perfil;
 import ec.com.bisolutions.pmanager.seguridad.model.RegistroSesion;
 import ec.com.bisolutions.pmanager.seguridad.model.Usuario;
 import java.util.Date;
 import java.util.List;
+import javax.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,7 +27,10 @@ import org.springframework.stereotype.Service;
 public class UsuarioService {
 
   private final UsuarioRepository usuarioRepository;
+  private final PerfilRepository perfilRepository;
+  private final JefaturaRepository jefaturaRepository;
   private final RegistroSesionRepository registroSesionRepository;
+  private final EmailService emailService;
 
   public List<Usuario> obtenerUsuarios(String estado) {
     if (estado.equals("ALL")) {
@@ -49,14 +57,35 @@ public class UsuarioService {
               if (codUsuarioTomado) throw new CreateException("Error, usuario no disponible");
             });
     String claveGenerada = RandomStringUtils.randomAlphabetic(8);
-    String claveEncriptada = DigestUtils.sha256Hex(claveGenerada);
+    // String claveEncriptada = DigestUtils.sha256Hex(claveGenerada);
+    String claveEncriptada = "1234";
 
-    usuario.setClave("1234");
+    usuario.setClave(claveEncriptada);
     usuario.setEstado(EstadoUsuarioEnum.ACTIVO.getValue());
     usuario.setNombre(usuario.getNombre().toUpperCase());
     usuario.setApellido(usuario.getApellido().toUpperCase());
     usuario.setFechaCreacion(new Date());
-    return this.usuarioRepository.save(usuario);
+    usuario.setPerfil(this.buscarPerfilPorCodigo(usuario.getCodPerfil()));
+    usuario.setJefatura(this.buscarJefaturaPorCodigo(usuario.getPk().getCodJefatura()));
+    try {
+      this.emailService.enviarClaveGenerada(
+          usuario.getMail(), usuario.getNombre() + " " + usuario.getApellido(), claveEncriptada, usuario.getPk().getCodUsuario());
+      return this.usuarioRepository.save(usuario);
+    } catch (MessagingException e) {
+      System.out.println("Error al enviar correo.");
+      return this.usuarioRepository.save(usuario);
+    }
+  }
+
+  public Usuario modificar(Usuario usuario) {
+    Usuario usuarioDB = this.buscarUsuarioPorCodigo(usuario.getPk().getCodUsuario());
+    usuarioDB.getPk().setCodJefatura(usuario.getPk().getCodJefatura());
+    usuarioDB.setCodPerfil(usuario.getCodPerfil());
+    usuarioDB.setNombre(usuario.getNombre());
+    usuarioDB.setApellido(usuario.getApellido());
+    usuarioDB.setMail(usuario.getMail());
+    usuarioDB.setEstado(usuario.getEstado());
+    return this.usuarioRepository.save(usuarioDB);
   }
 
   public Usuario modificarEstado(Usuario usuario) {
@@ -114,5 +143,17 @@ public class UsuarioService {
     return this.usuarioRepository
         .findByPkCodUsuario(codUsuario)
         .orElseThrow(() -> new NotFoundException("Error, el usuario no existe"));
+  }
+
+  private Perfil buscarPerfilPorCodigo(String codPerfil) {
+    return this.perfilRepository
+        .findById(codPerfil)
+        .orElseThrow(() -> new NotFoundException("Error, el perfil no existe"));
+  }
+
+  private Jefatura buscarJefaturaPorCodigo(Integer codJefatura) {
+    return this.jefaturaRepository
+        .findById(codJefatura)
+        .orElseThrow(() -> new NotFoundException("Error, la jefatura no existe"));
   }
 }

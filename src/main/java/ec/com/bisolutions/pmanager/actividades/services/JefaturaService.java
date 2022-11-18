@@ -28,21 +28,21 @@ public class JefaturaService {
   }
 
   public Jefatura modificar(Jefatura jefatura) {
-    Jefatura jefaturaDB = buscarPorSiglas(jefatura.getSiglas());
+    Jefatura jefaturaDB = buscarPorCodigo(jefatura.getCodJefatura());
     jefaturaDB.setSiglas(jefatura.getSiglas());
     jefaturaDB.setNombre(jefatura.getNombre());
     return this.jefaturaRepository.save(jefaturaDB);
   }
 
-  public void eliminar(String siglas) {
-    Jefatura jefaturaDB = buscarPorSiglas(siglas);
+  public void eliminar(Integer codJefatura) {
+    Jefatura jefaturaDB = buscarPorCodigo(codJefatura);
     this.jefaturaRepository.delete(jefaturaDB);
   }
 
-  private Jefatura buscarPorSiglas(String siglas) {
-    Optional<Jefatura> jefaturaOPT = this.jefaturaRepository.findBySiglas(siglas);
-    if (jefaturaOPT.isPresent()) {
-      throw new ModificarException("No se encontró la jefatura con las siglas " + siglas);
+  private Jefatura buscarPorCodigo(Integer codJefatura) {
+    Optional<Jefatura> jefaturaOPT = this.jefaturaRepository.findById(codJefatura);
+    if (!jefaturaOPT.isPresent()) {
+      throw new ModificarException("No se encontró la jefatura con id " + codJefatura);
     }
     return jefaturaOPT.get();
   }

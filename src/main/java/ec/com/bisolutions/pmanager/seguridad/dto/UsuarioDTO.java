@@ -24,4 +24,8 @@ public class UsuarioDTO {
   private String mail;
 
   private String estado;
+
+  private String nombreJefatura;
+
+  private String nombrePerfil;
 }

@@ -1,10 +1,13 @@
 package ec.com.bisolutions.pmanager.seguridad.model;
 
+import ec.com.bisolutions.pmanager.actividades.model.Jefatura;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -30,7 +33,7 @@ public class Usuario implements Serializable {
 
   @EqualsAndHashCode.Include @EmbeddedId protected UsuarioPK pk;
 
-  @Column(name = "COD_PERFIL", nullable = false, updatable = false, length = 3)
+  @Column(name = "COD_PERFIL", nullable = false, length = 3)
   private String codPerfil;
 
   @Column(name = "NOMBRE", nullable = false, length = 32)
@@ -66,16 +69,19 @@ public class Usuario implements Serializable {
   // @OneToMany(cascade = CascadeType.ALL, mappedBy = "segUsuario")
   // private List<Producto> actProductoList;
 
-  // @JoinColumn(
-  //     name = "COD_DEPARTAMENTO",
-  //     referencedColumnName = "COD_DEPARTAMENTO",
-  //     nullable = false,
-  //     insertable = false,
-  //     updatable = false)
-  // @ManyToOne(optional = false)
-  // private Jefatura actDepartamento;
+  @JoinColumn(
+      name = "COD_JEFATURA",
+      referencedColumnName = "COD_JEFATURA",
+      insertable = false,
+      updatable = false)
+  @ManyToOne(optional = false)
+  private Jefatura jefatura;
 
-  // @JoinColumn(name = "COD_PERFIL", referencedColumnName = "COD_PERFIL")
-  // @ManyToOne
-  // private Perfil codPerfil;
+  @JoinColumn(
+      name = "COD_PERFIL",
+      referencedColumnName = "COD_PERFIL",
+      insertable = false,
+      updatable = false)
+  @ManyToOne
+  private Perfil perfil;
 }

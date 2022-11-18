@@ -63,6 +63,8 @@ public class ProductoService {
     producto.setQaProductosRechazados(0);
     producto.setEntregadoQa(0);
     producto.setAplazado("NO");
+    producto.setFechaRealEntrega(
+        producto.getPorcentajeCumplimiento().equals(new BigDecimal(100)) ? new Date() : null);
     return this.productoRepository.save(producto);
   }
 
@@ -133,6 +135,8 @@ public class ProductoService {
 
     if (producto.getPorcentajeCumplimiento().equals(new BigDecimal(100))) {
       productoDB.setFechaRealEntrega(new Date());
+    } else if (productoDB.getFechaEstimadaEntrega() != null) {
+      productoDB.setFechaRealEntrega(null);
     }
 
     RegistroModificacion registroModificacion = crearRegistroModificacion(producto, comentario);
