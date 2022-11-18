@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,10 +29,10 @@ public class UsuarioResource {
   private final UsuarioService service;
   private final PerfilRepository rep;
 
+  @PreAuthorize("hasAnyRole('ADM','REC')")
   @GetMapping(path = "/estado/{estado}")
   public ResponseEntity<List<UsuarioDTO>> obtenerUsuarios(@PathVariable String estado) {
     List<Usuario> usuarios = this.service.obtenerUsuarios(estado);
-    System.out.println(usuarios);
     List<UsuarioDTO> usuariosDTO = new ArrayList<UsuarioDTO>();
     for (Usuario usuario : usuarios) {
       usuariosDTO.add(UsuarioMapper.buildUserDTO(usuario));
