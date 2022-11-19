@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class JefaturaResource {
   private final JefaturaService service;
 
+  @PreAuthorize("hasRole('ADM')")
   @GetMapping
   public ResponseEntity<List<JefaturaDTO>> obtenerJefaturas() {
     List<Jefatura> jefaturas = this.service.obtenerJefaturas();
@@ -33,18 +35,21 @@ public class JefaturaResource {
     return ResponseEntity.ok(jefaturasDTO);
   }
 
+  @PreAuthorize("hasRole('ADM')")
   @PostMapping
   public ResponseEntity<JefaturaDTO> crear(@RequestBody JefaturaDTO dto) {
     Jefatura jefatura = this.service.crear(JefaturaMapper.buildJefatura(dto));
     return ResponseEntity.ok(JefaturaMapper.buildJefaturaDTO(jefatura));
   }
 
+  @PreAuthorize("hasRole('ADM')")
   @PutMapping
   public ResponseEntity<JefaturaDTO> modificar(@RequestBody JefaturaDTO dto) {
     Jefatura jefatura = this.service.modificar(JefaturaMapper.buildJefatura(dto));
     return ResponseEntity.ok(JefaturaMapper.buildJefaturaDTO(jefatura));
   }
 
+  @PreAuthorize("hasRole('ADM')")
   @DeleteMapping(path = "/eliminar/{codJefatura}")
   public ResponseEntity<Void> eliminar(@PathVariable Integer codJefatura) {
     this.service.eliminar(codJefatura);

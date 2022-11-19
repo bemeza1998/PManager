@@ -1,12 +1,14 @@
-package ec.com.bisolutions.pmanager.config;
+package ec.com.bisolutions.pmanager.seguridad.utils;
 
 import java.util.Collection;
+import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@Builder
 public class UserPrincipal implements UserDetails {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1788989L;
   private String username;
   private String password;
   private boolean enabled;

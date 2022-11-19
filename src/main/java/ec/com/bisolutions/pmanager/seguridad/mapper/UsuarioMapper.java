@@ -1,5 +1,6 @@
 package ec.com.bisolutions.pmanager.seguridad.mapper;
 
+import ec.com.bisolutions.pmanager.seguridad.dto.UserAuthDTO;
 import ec.com.bisolutions.pmanager.seguridad.dto.UsuarioDTO;
 import ec.com.bisolutions.pmanager.seguridad.model.Usuario;
 import ec.com.bisolutions.pmanager.seguridad.model.UsuarioPK;
@@ -35,6 +36,18 @@ public class UsuarioMapper {
         .estado(usuario.getEstado())
         .nombreJefatura(usuario.getJefatura().getNombre())
         .nombrePerfil(usuario.getPerfil().getNombre())
+        .build();
+  }
+
+  public static UserAuthDTO buildUserAuthDTO(Usuario usuario) {
+    return UserAuthDTO.builder()
+        .codUsuario(usuario.getPk().getCodUsuario())
+        .codPerfil(usuario.getCodPerfil())
+        .nombre(usuario.getNombre())
+        .apellido(usuario.getApellido())
+        .mail(usuario.getMail())
+        .nombrePerfil(usuario.getPerfil().getNombre())
+        .token("")
         .build();
   }
 }

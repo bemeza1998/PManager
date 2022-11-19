@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ public class ProductoResource {
 
   private final ProductoService service;
 
+  @PreAuthorize("hasRole('ADM','REC')")
   @GetMapping
   public ResponseEntity<List<ProductoDTO>> obtenerProductos(@RequestParam String codUsuario) {
     List<Producto> productos = this.service.obtenerProductos(codUsuario);
@@ -37,6 +39,7 @@ public class ProductoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
+  @PreAuthorize("hasRole('ADM','CAL')")
   @GetMapping(path = "/todos")
   public ResponseEntity<List<ProductoDTO>> obtenerProductosTodos() {
     List<Producto> productos = this.service.obtenerProductosTodos();
@@ -47,6 +50,7 @@ public class ProductoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
+  @PreAuthorize("hasRole('ADM','REC','CAL')")
   @GetMapping(path = "/filtro")
   public ResponseEntity<List<ProductoDTO>> obtenerProductosPorFiltro(
       @RequestParam(required = false) Integer codProyecto,
@@ -64,6 +68,7 @@ public class ProductoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
+  @PreAuthorize("hasRole('ADM','JEF','ALP')")
   @GetMapping(path = "/estado")
   public ResponseEntity<List<ProductoDTO>> obtenerPorEstadoModificacion() {
     List<Producto> productos = this.service.obtenerPorEstadoModificacion();
@@ -74,30 +79,35 @@ public class ProductoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
+  @PreAuthorize("hasRole('ADM','REC')")
   @PostMapping
   public ResponseEntity<ProductoDTO> crear(@RequestBody ProductoDTO dto) {
     Producto producto = this.service.crear(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 
+  @PreAuthorize("hasRole('ADM','REC')")
   @PutMapping
   public ResponseEntity<ProductoDTO> modificar(@RequestBody ProductoDTO dto) {
     Producto producto = this.service.modificar(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 
+  @PreAuthorize("hasRole('ADM','CAL')")
   @PutMapping(path = "/qa")
   public ResponseEntity<ProductoDTO> modificarQA(@RequestBody ProductoDTO dto) {
     Producto producto = this.service.modificarQA(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 
+  @PreAuthorize("hasRole('ADM','REC','JEF','ALP')")
   @PatchMapping
   public ResponseEntity<ProductoDTO> solicitarEstado(@RequestBody ProductoDTO dto) {
     Producto producto = this.service.solicitarEstado(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 
+  @PreAuthorize("hasRole('ADM','REC')")
   @PatchMapping(path = "/porcentaje")
   public ResponseEntity<ProductoDTO> modificarPorcentajeCumplimiento(@RequestBody ProductoDTO dto) {
     Producto producto =

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,7 @@ public class ProyectoResource {
     return ResponseEntity.ok(proyectosDTO);
   }
 
+  @PreAuthorize("hasRole('ADM','JEF')")
   @GetMapping(path = "/estado")
   public ResponseEntity<List<ProyectoDTO>> obtenerPorEstadoModificacion() {
     List<Proyecto> proyectos = this.service.obtenerPorEstadoModificacion();
@@ -43,18 +45,21 @@ public class ProyectoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
+  @PreAuthorize("hasRole('ADM','ALP')")
   @PostMapping
   public ResponseEntity<ProyectoDTO> crear(@RequestBody ProyectoDTO dto) {
     Proyecto proyecto = this.service.crear(ProyectoMapper.buildProyecto(dto));
     return ResponseEntity.ok(ProyectoMapper.buildProyectoDTO(proyecto));
   }
 
+  @PreAuthorize("hasRole('ADM','ALP')")
   @PutMapping
   public ResponseEntity<ProyectoDTO> modificar(@RequestBody ProyectoDTO dto) {
     Proyecto proyecto = this.service.modificar(ProyectoMapper.buildProyecto(dto));
     return ResponseEntity.ok(ProyectoMapper.buildProyectoDTO(proyecto));
   }
 
+  @PreAuthorize("hasRole('ADM','ALP')")
   @PatchMapping
   public ResponseEntity<ProyectoDTO> modificarEstadoSolicitud(@RequestBody ProyectoDTO dto) {
     Proyecto proyecto = this.service.modificarEstadoSolicitud(ProyectoMapper.buildProyecto(dto));

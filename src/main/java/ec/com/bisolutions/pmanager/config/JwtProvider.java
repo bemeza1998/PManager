@@ -1,5 +1,6 @@
 package ec.com.bisolutions.pmanager.config;
 
+import ec.com.bisolutions.pmanager.seguridad.utils.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -27,6 +28,18 @@ public class JwtProvider {
 
     return Jwts.builder()
         .setSubject(userPrincipal.getUsername())
+        .setIssuedAt(new Date())
+        .setExpiration(expiryDate)
+        .signWith(SignatureAlgorithm.HS512, jwtSecret)
+        .compact();
+  }
+
+  public String generateTokenOnlyUser(String codUsuario) {
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+    return Jwts.builder()
+        .setSubject(codUsuario)
         .setIssuedAt(new Date())
         .setExpiration(expiryDate)
         .signWith(SignatureAlgorithm.HS512, jwtSecret)

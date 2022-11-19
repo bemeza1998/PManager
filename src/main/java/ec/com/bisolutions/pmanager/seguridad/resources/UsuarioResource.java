@@ -1,12 +1,12 @@
 package ec.com.bisolutions.pmanager.seguridad.resources;
 
-import ec.com.bisolutions.pmanager.seguridad.dao.PerfilRepository;
 import ec.com.bisolutions.pmanager.seguridad.dto.LoginDTO;
+import ec.com.bisolutions.pmanager.seguridad.dto.UserAuthDTO;
 import ec.com.bisolutions.pmanager.seguridad.dto.UsuarioDTO;
 import ec.com.bisolutions.pmanager.seguridad.mapper.UsuarioMapper;
-import ec.com.bisolutions.pmanager.seguridad.model.Perfil;
 import ec.com.bisolutions.pmanager.seguridad.model.Usuario;
 import ec.com.bisolutions.pmanager.seguridad.services.UsuarioService;
+import ec.com.bisolutions.pmanager.seguridad.utils.JWTResponse;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UsuarioResource {
   private final UsuarioService service;
-  private final PerfilRepository rep;
 
-  @PreAuthorize("hasAnyRole('ADM','REC')")
+  @PreAuthorize("hasRole('ADM')")
   @GetMapping(path = "/estado/{estado}")
   public ResponseEntity<List<UsuarioDTO>> obtenerUsuarios(@PathVariable String estado) {
     List<Usuario> usuarios = this.service.obtenerUsuarios(estado);
@@ -40,23 +39,21 @@ public class UsuarioResource {
     return ResponseEntity.ok(usuariosDTO);
   }
 
+  @PreAuthorize("hasRole('ADM')")
   @PostMapping
   public ResponseEntity<UsuarioDTO> crear(@RequestBody UsuarioDTO dto) {
     Usuario usuario = this.service.crear(UsuarioMapper.buildUser(dto));
     return ResponseEntity.ok(UsuarioMapper.buildUserDTO(usuario));
   }
 
-  @PostMapping(path = "/perfil")
-  public ResponseEntity<Perfil> crearPerfil(@RequestBody Perfil dto) {
-    return ResponseEntity.ok(this.rep.save(dto));
-  }
-
+  @PreAuthorize("hasRole('ADM')")
   @PutMapping
   public ResponseEntity<UsuarioDTO> modificar(@RequestBody UsuarioDTO dto) {
     Usuario usuario = this.service.modificar(UsuarioMapper.buildUser(dto));
     return ResponseEntity.ok(UsuarioMapper.buildUserDTO(usuario));
   }
 
+  @PreAuthorize("hasRole('ADM')")
   @PatchMapping(path = "/estado")
   public ResponseEntity<UsuarioDTO> modificarEstadoUsuario(@RequestBody UsuarioDTO dto) {
     Usuario usuario = this.service.modificarEstado(UsuarioMapper.buildUser(dto));
@@ -64,9 +61,15 @@ public class UsuarioResource {
   }
 
   @PutMapping(path = "/login")
-  public ResponseEntity<UsuarioDTO> iniciarSesion(@RequestBody LoginDTO loginDto) {
-    Usuario usuario = this.service.iniciarSesion(loginDto.getCodUsuario(), loginDto.getClave());
-    return ResponseEntity.ok(UsuarioMapper.buildUserDTO(usuario));
+  public ResponseEntity<JWTResponse> iniciarSesion(@RequestBody LoginDTO loginDto) {
+    String jwt = this.service.generarJWT(loginDto.getCodUsuario(), loginDto.getClave());
+    return ResponseEntity.ok(JWTResponse.builder().token(jwt).build());
+  }
+
+  @GetMapping(path = "/renovar")
+  public ResponseEntity<UserAuthDTO> renovarToken() {
+    UserAuthDTO userAuthDTO = this.service.renovarToken();
+    return ResponseEntity.ok(userAuthDTO);
   }
 
   @PatchMapping(path = "/clave")
