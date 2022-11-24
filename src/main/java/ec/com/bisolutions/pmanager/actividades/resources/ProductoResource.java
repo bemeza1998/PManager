@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +29,7 @@ public class ProductoResource {
 
   private final ProductoService service;
 
-  @PreAuthorize("hasRole('ADM','REC')")
+  @PreAuthorize("hasAnyRole('ADM','REC')")
   @GetMapping
   public ResponseEntity<List<ProductoDTO>> obtenerProductos(@RequestParam String codUsuario) {
     List<Producto> productos = this.service.obtenerProductos(codUsuario);
@@ -39,7 +40,15 @@ public class ProductoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
-  @PreAuthorize("hasRole('ADM','CAL')")
+  @PreAuthorize("hasAnyRole('ADM','CAL')")
+  @GetMapping(path = "/productoqa/{codUsuario}/{codProducto}")
+  public ResponseEntity<ProductoDTO> obtenerProductoQA(
+      @PathVariable String codUsuario, @PathVariable Integer codProducto) {
+    Producto producto = this.service.obtenerProductoQA(codUsuario, codProducto);
+    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+  }
+
+  @PreAuthorize("hasAnyRole('ADM','CAL')")
   @GetMapping(path = "/todos")
   public ResponseEntity<List<ProductoDTO>> obtenerProductosTodos() {
     List<Producto> productos = this.service.obtenerProductosTodos();
@@ -50,7 +59,7 @@ public class ProductoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
-  @PreAuthorize("hasRole('ADM','REC','CAL')")
+  @PreAuthorize("hasAnyRole('ADM','REC','CAL')")
   @GetMapping(path = "/filtro")
   public ResponseEntity<List<ProductoDTO>> obtenerProductosPorFiltro(
       @RequestParam(required = false) Integer codProyecto,
@@ -68,7 +77,7 @@ public class ProductoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
-  @PreAuthorize("hasRole('ADM','JEF','ALP')")
+  @PreAuthorize("hasAnyRole('ADM','JEF','ALP')")
   @GetMapping(path = "/estado")
   public ResponseEntity<List<ProductoDTO>> obtenerPorEstadoModificacion() {
     List<Producto> productos = this.service.obtenerPorEstadoModificacion();
@@ -79,39 +88,53 @@ public class ProductoResource {
     return ResponseEntity.ok(productosDTO);
   }
 
-  @PreAuthorize("hasRole('ADM','REC')")
+  @PreAuthorize("hasAnyRole('ADM','REC')")
   @PostMapping
   public ResponseEntity<ProductoDTO> crear(@RequestBody ProductoDTO dto) {
     Producto producto = this.service.crear(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 
-  @PreAuthorize("hasRole('ADM','REC')")
+  @PreAuthorize("hasAnyRole('ADM','REC')")
   @PutMapping
   public ResponseEntity<ProductoDTO> modificar(@RequestBody ProductoDTO dto) {
     Producto producto = this.service.modificar(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 
-  @PreAuthorize("hasRole('ADM','CAL')")
+  @PreAuthorize("hasAnyRole('ADM','CAL')")
   @PutMapping(path = "/qa")
   public ResponseEntity<ProductoDTO> modificarQA(@RequestBody ProductoDTO dto) {
     Producto producto = this.service.modificarQA(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 
-  @PreAuthorize("hasRole('ADM','REC','JEF','ALP')")
+  @PreAuthorize("hasAnyRole('ADM','REC','JEF','ALP')")
   @PatchMapping
   public ResponseEntity<ProductoDTO> solicitarEstado(@RequestBody ProductoDTO dto) {
     Producto producto = this.service.solicitarEstado(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 
-  @PreAuthorize("hasRole('ADM','REC')")
+  @PreAuthorize("hasAnyRole('ADM','REC')")
   @PatchMapping(path = "/porcentaje")
   public ResponseEntity<ProductoDTO> modificarPorcentajeCumplimiento(@RequestBody ProductoDTO dto) {
     Producto producto =
         this.service.modificarPorcentajeCumplimiento(ProductoMapper.buildProducto(dto));
+    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+  }
+
+  @PreAuthorize("hasAnyRole('ADM','CAL')")
+  @PatchMapping(path = "/estadoqa")
+  public ResponseEntity<ProductoDTO> modificarEstadoQA(@RequestBody ProductoDTO dto) {
+    Producto producto = this.service.modificarEstadoQA(ProductoMapper.buildProducto(dto));
+    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+  }
+
+  @PreAuthorize("hasAnyRole('ADM','CAL')")
+  @PatchMapping(path = "/observacionqa")
+  public ResponseEntity<ProductoDTO> modificarObservacionQA(@RequestBody ProductoDTO dto) {
+    Producto producto = this.service.modificarObservacionQA(ProductoMapper.buildProducto(dto));
     return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
   }
 }

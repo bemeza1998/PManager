@@ -2,6 +2,7 @@ package ec.com.bisolutions.pmanager.actividades.services;
 
 import ec.com.bisolutions.pmanager.actividades.dao.ProductoRepository;
 import ec.com.bisolutions.pmanager.actividades.dao.RegistroModificacionRepository;
+import ec.com.bisolutions.pmanager.actividades.enums.EstadoQaEnum;
 import ec.com.bisolutions.pmanager.actividades.enums.EstadoSolicitudModificar;
 import ec.com.bisolutions.pmanager.actividades.enums.TipoTablaEnum;
 import ec.com.bisolutions.pmanager.actividades.model.Producto;
@@ -35,6 +36,11 @@ public class ProductoService {
         EstadoUsuarioEnum.ACTIVO.getValue());
   }
 
+  public Producto obtenerProductoQA(String codUsuario, Integer codProducto) {
+    return this.buscarPorCodigo(
+        ProductoPK.builder().codUsuario(codUsuario).codProducto(codProducto).build());
+  }
+
   public List<Producto> obtenerPorEstadoModificacion() {
     String[] estados = {
       EstadoSolicitudModificar.SOLICITADO.getValue(),
@@ -65,6 +71,7 @@ public class ProductoService {
     producto.setAplazado("NO");
     producto.setFechaRealEntrega(
         producto.getPorcentajeCumplimiento().equals(new BigDecimal(100)) ? new Date() : null);
+    producto.setQaEstado(EstadoQaEnum.POR_REVISAR.getValue());
     return this.productoRepository.save(producto);
   }
 
@@ -100,6 +107,8 @@ public class ProductoService {
     productoDB.setObservaciones(producto.getObservaciones());
     productoDB.setProyecto(producto.getProyecto());
     productoDB.setEstadoSolicitudModificacion(EstadoSolicitudModificar.NO_SOLICITADO.getValue());
+    productoDB.setFechaRealEntrega(
+        producto.getPorcentajeCumplimiento().equals(new BigDecimal(100)) ? new Date() : null);
 
     RegistroModificacion registroModificacion = crearRegistroModificacion(producto, "");
     this.registroModificacionRepository.save(registroModificacion);
@@ -150,6 +159,18 @@ public class ProductoService {
     productoDB.setEstadoSolicitudModificacion(producto.getEstadoSolicitudModificacion());
     productoDB.setFechaSolicitudModificacion(new Date());
     productoDB.setComentarioSolicitudModificacion(producto.getComentarioSolicitudModificacion());
+    return this.productoRepository.save(productoDB);
+  }
+
+  public Producto modificarEstadoQA(Producto producto) {
+    Producto productoDB = this.buscarPorCodigo(producto.getPk());
+    productoDB.setQaEstado(producto.getQaEstado());
+    return this.productoRepository.save(productoDB);
+  }
+
+  public Producto modificarObservacionQA(Producto producto) {
+    Producto productoDB = this.buscarPorCodigo(producto.getPk());
+    productoDB.setQaObservaciones(producto.getQaObservaciones());
     return this.productoRepository.save(productoDB);
   }
 

@@ -92,13 +92,11 @@ public class Proyecto implements Serializable {
   @Column(name = "NOMBRE_EMPRESA", length = 128)
   private String nombreEmpresa;
 
-  // @JoinColumns({
-  //   @JoinColumn(name = "COD_USUARIO", referencedColumnName = "COD_USUARIO"),
-  //   @JoinColumn(name = "COD_DEPARTAMENTO", referencedColumnName = "COD_DEPARTAMENTO")
-  // })
-  // @ManyToOne
-  // private Usuario segUsuario;
-
-  // @OneToMany(mappedBy = "proyecto")
-  // private List<Producto> actProductoList;
+  /*@JoinColumn(
+      name = "COD_EMPRESA",
+      referencedColumnName = "COD_EMPRESA",
+      insertable = false,
+      updatable = false)
+  @ManyToOne
+  private Empresa empresa;*/
 }

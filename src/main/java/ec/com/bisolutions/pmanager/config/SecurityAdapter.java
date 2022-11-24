@@ -54,10 +54,6 @@ public class SecurityAdapter extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/ap1/v1/usuario/**")
         .permitAll()
-        .antMatchers("/ap1/v1/producto/**")
-        .authenticated()
-        .antMatchers("/ap1/v1/perfil/**")
-        .authenticated()
         .and()
         .exceptionHandling()
         .authenticationEntryPoint(

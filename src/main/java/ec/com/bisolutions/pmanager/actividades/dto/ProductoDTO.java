@@ -53,6 +53,8 @@ public class ProductoDTO {
 
   private String qaObservaciones;
 
+  private String qaEstado;
+
   private String estadoSolicitudModificacion;
 
   private Date fechaSolicitudModificacion;

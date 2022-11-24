@@ -1,6 +1,5 @@
 package ec.com.bisolutions.pmanager.actividades.model;
 
-import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,25 +13,32 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "ACT_JEFATURA")
+@Table(name = "ACT_EMPRESA")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Jefatura implements Serializable {
-
-  private static final long serialVersionUID = 12213123L;
+public class Empresa {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "COD_JEFATURA", nullable = false)
+  @Column(name = "COD_EMPRESA", nullable = false)
   @EqualsAndHashCode.Include
-  private Integer codJefatura;
+  private Integer codEmpresa;
 
-  @Column(name = "NOMBRE", nullable = false, length = 32)
-  private String nombre;
+  @Column(name = "NOMBRE_EMPRESA", nullable = false, length = 128)
+  private String nombreEmpresa;
 
-  @Column(name = "SIGLAS", nullable = false, length = 4)
-  private String siglas;
+  @Column(name = "DIRECCION", length = 512)
+  private String direccion;
+
+  @Column(name = "TELEFONO", length = 16)
+  private String telefono;
+
+  @Column(name = "MAIL", length = 64)
+  private String mail;
+
+  @Column(name = "CLIENTE_ACTIVO", length = 1, nullable = false)
+  private String estado;
 }

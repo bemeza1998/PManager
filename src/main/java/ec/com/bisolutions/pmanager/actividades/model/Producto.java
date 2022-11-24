@@ -88,6 +88,9 @@ public class Producto implements Serializable {
   @Column(name = "QA_OBSERVACIONES", length = 516)
   private String qaObservaciones;
 
+  @Column(name = "QA_ESTADO", length = 516)
+  private String qaEstado;
+
   @Column(name = "FECHA_CREACION", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date fechaCreacion;
