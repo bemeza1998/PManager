@@ -1,10 +1,12 @@
 package ec.com.bisolutions.pmanager.actividades.services;
 
+import ec.com.bisolutions.pmanager.actividades.dao.EmpresaRepository;
 import ec.com.bisolutions.pmanager.actividades.dao.ProductoRepository;
 import ec.com.bisolutions.pmanager.actividades.dao.RegistroModificacionRepository;
 import ec.com.bisolutions.pmanager.actividades.enums.EstadoQaEnum;
 import ec.com.bisolutions.pmanager.actividades.enums.EstadoSolicitudModificar;
 import ec.com.bisolutions.pmanager.actividades.enums.TipoTablaEnum;
+import ec.com.bisolutions.pmanager.actividades.model.Empresa;
 import ec.com.bisolutions.pmanager.actividades.model.Producto;
 import ec.com.bisolutions.pmanager.actividades.model.ProductoPK;
 import ec.com.bisolutions.pmanager.actividades.model.RegistroModificacion;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class ProductoService {
 
   private final ProductoRepository productoRepository;
+  private final EmpresaRepository empresaRepository;
   private final RegistroModificacionRepository registroModificacionRepository;
 
   public List<Producto> obtenerProductos(String codUsuario) {
@@ -31,9 +34,14 @@ public class ProductoService {
             codUsuario, noEliminado, EstadoUsuarioEnum.ACTIVO.getValue());
   }
 
-  public List<Producto> obtenerProductosTodos() {
-    return this.productoRepository.findByUsuarioEstadoOrderByFechaCreacionDesc(
-        EstadoUsuarioEnum.ACTIVO.getValue());
+  public List<Producto> obtenerProductosTodos(Date semana) {
+    if (semana == null) {
+      return this.productoRepository.findByUsuarioEstadoOrderByFechaCreacionDesc(
+          EstadoUsuarioEnum.ACTIVO.getValue());
+    } else {
+      return this.productoRepository.findByUsuarioEstadoAndSemanaOrderByFechaCreacionDesc(
+          EstadoUsuarioEnum.ACTIVO.getValue(), semana);
+    }
   }
 
   public Producto obtenerProductoQA(String codUsuario, Integer codProducto) {
@@ -55,10 +63,12 @@ public class ProductoService {
       Integer codProyecto,
       String nombreCreador,
       BigDecimal porcentaje,
+      Integer mes,
       Date semana,
-      String nombreProducto) {
+      String nombreProducto,
+      String estadoQa) {
     return this.productoRepository.buscarProductosPorFiltro(
-        codProyecto, nombreCreador, porcentaje, semana, nombreProducto);
+        codProyecto, nombreCreador, porcentaje, mes, semana, nombreProducto, estadoQa);
   }
 
   public Producto crear(Producto producto) {
@@ -97,6 +107,13 @@ public class ProductoService {
 
   public Producto modificar(Producto producto) {
     Producto productoDB = this.buscarPorCodigo(producto.getPk());
+    Date fechaReal =
+        producto.getPorcentajeCumplimiento().equals(new BigDecimal(100))
+                && productoDB.getPorcentajeCumplimiento().equals(new BigDecimal(100))
+            ? null
+            : (producto.getPorcentajeCumplimiento().equals(new BigDecimal(100))
+                ? new Date()
+                : null);
     productoDB.setCodProyecto(producto.getCodProyecto());
     productoDB.setNombre(producto.getNombre());
     productoDB.setSemana(producto.getSemana());
@@ -104,12 +121,13 @@ public class ProductoService {
     productoDB.setHorasEstimadas(producto.getHorasEstimadas());
     productoDB.setPorcentajeCumplimiento(producto.getPorcentajeCumplimiento());
     productoDB.setCronograma(producto.getCronograma());
-    productoDB.setObservaciones(producto.getObservaciones());
+    // productoDB.setObservaciones(producto.getObservaciones());
     productoDB.setProyecto(producto.getProyecto());
     productoDB.setEstadoSolicitudModificacion(EstadoSolicitudModificar.NO_SOLICITADO.getValue());
-    productoDB.setFechaRealEntrega(
-        producto.getPorcentajeCumplimiento().equals(new BigDecimal(100)) ? new Date() : null);
-
+    productoDB.setFechaRealEntrega(fechaReal);
+    productoDB
+        .getProyecto()
+        .setEmpresa(this.buscarEmpresa(productoDB.getProyecto().getCodEmpresa()));
     RegistroModificacion registroModificacion = crearRegistroModificacion(producto, "");
     this.registroModificacionRepository.save(registroModificacion);
 
@@ -131,10 +149,12 @@ public class ProductoService {
     return this.productoRepository.save(productoDB);
   }
 
-  public Producto modificarPorcentajeCumplimiento(Producto producto) {
+  public Producto modificarPorcentajeCumplimiento(Producto producto, String usuario) {
     Producto productoDB = this.buscarPorCodigo(producto.getPk());
     String comentario =
-        "Modificación en el porcentaje de cumplimiento del producto "
+        "El usuario "
+            + usuario
+            + " modificó el porcentaje de cumplimiento del producto "
             + producto.getNombre()
             + ", cambiado de "
             + productoDB.getPorcentajeCumplimiento()
@@ -146,6 +166,9 @@ public class ProductoService {
       productoDB.setFechaRealEntrega(new Date());
     } else if (productoDB.getFechaEstimadaEntrega() != null) {
       productoDB.setFechaRealEntrega(null);
+      if (producto.getQaEstado().equals(EstadoQaEnum.APROBADO_QA.getValue())) {
+        productoDB.setQaEstado(EstadoQaEnum.POR_REVISAR.getValue());
+      }
     }
 
     RegistroModificacion registroModificacion = crearRegistroModificacion(producto, comentario);
@@ -153,6 +176,40 @@ public class ProductoService {
 
     return this.productoRepository.save(productoDB);
   }
+
+  public Producto modificarCronograma(Producto producto) {
+    Producto productoDB = this.buscarPorCodigo(producto.getPk());
+    String comentario =
+        "Modificación en el cronograma del producto "
+            + producto.getNombre()
+            + ", cambiado de "
+            + productoDB.getCronograma()
+            + " a "
+            + producto.getCronograma();
+    productoDB.setCronograma(producto.getCronograma());
+
+    RegistroModificacion registroModificacion = crearRegistroModificacion(producto, comentario);
+    this.registroModificacionRepository.save(registroModificacion);
+
+    return this.productoRepository.save(productoDB);
+  }
+
+  /*public Producto modificarObservaciones(Producto producto) {
+    Producto productoDB = this.buscarPorCodigo(producto.getPk());
+    String comentario =
+        "Modificación en las observaciones del producto "
+            + producto.getNombre()
+            + ", cambiado de "
+            + productoDB.getObservaciones()
+            + " a "
+            + producto.getObservaciones();
+    productoDB.setObservaciones(producto.getObservaciones());
+
+    RegistroModificacion registroModificacion = crearRegistroModificacion(producto, comentario);
+    this.registroModificacionRepository.save(registroModificacion);
+
+    return this.productoRepository.save(productoDB);
+  }*/
 
   public Producto solicitarEstado(Producto producto) {
     Producto productoDB = this.buscarPorCodigo(producto.getPk());
@@ -191,6 +248,12 @@ public class ProductoService {
         .orElseThrow(() -> new NotFoundException("Error, el producto no existe"));
   }
 
+  private Empresa buscarEmpresa(Integer codEmpresa) {
+    return this.empresaRepository
+        .findById(codEmpresa)
+        .orElseThrow(() -> new NotFoundException("Error, la empresa no existe"));
+  }
+
   private RegistroModificacion crearRegistroModificacion(Producto producto, String comentario) {
     return RegistroModificacion.builder()
         .codRegistroModificado(producto.getPk().getCodProducto())
@@ -213,7 +276,7 @@ public class ProductoService {
         .codJefatura(producto.getCodJefatura())
         .codProyecto(producto.getCodProyecto())
         .nombreUsuarioCompleto(producto.getNombreUsuarioCompleto())
-        .mes(producto.getMes()) // arreglar mes
+        .mes(producto.getMes())
         .semana(nuevaSemana)
         .fechaEstimadaEntrega(producto.getFechaEstimadaEntrega())
         .horasEstimadas(producto.getHorasEstimadas())

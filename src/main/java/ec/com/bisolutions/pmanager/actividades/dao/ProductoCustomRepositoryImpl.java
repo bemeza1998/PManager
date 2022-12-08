@@ -25,8 +25,10 @@ public class ProductoCustomRepositoryImpl implements ProductoCustomRepository {
       Integer codProyecto,
       String nombreCreador,
       BigDecimal porcentaje,
+      Integer mes,
       Date semana,
-      String nombreProducto) {
+      String nombreProducto,
+      String estadoQa) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Producto> cq = cb.createQuery(Producto.class);
 
@@ -42,11 +44,17 @@ public class ProductoCustomRepositoryImpl implements ProductoCustomRepository {
     if (porcentaje != null) {
       predicates.add(cb.equal(producto.get("porcentajeCumplimiento"), porcentaje));
     }
+    if (mes != null) {
+      predicates.add(cb.equal(producto.get("mes"), mes));
+    }
     if (semana != null) {
       predicates.add(cb.equal(producto.get("semana"), semana));
     }
     if (nombreProducto != null) {
       predicates.add(cb.like(producto.get("nombre"), "%" + nombreProducto + "%"));
+    }
+    if (estadoQa != null && !estadoQa.isEmpty()) {
+      predicates.add(cb.equal(producto.get("qaEstado"), estadoQa));
     }
     cq.where(predicates.toArray(new Predicate[0]));
 

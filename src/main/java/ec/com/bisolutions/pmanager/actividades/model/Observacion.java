@@ -1,5 +1,6 @@
 package ec.com.bisolutions.pmanager.actividades.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,36 +17,32 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "ACT_EMPRESA")
+@Table(name = "ACT_OBSERVACION")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Empresa {
+public class Observacion implements Serializable {
+
+  private static final long serialVersionUID = 122342323L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "COD_EMPRESA", nullable = false)
+  @Column(name = "COD_OBSERVACION", nullable = false)
   @EqualsAndHashCode.Include
-  private Integer codEmpresa;
+  private Integer codObservacion;
 
-  @Column(name = "NOMBRE_EMPRESA", nullable = false, length = 128)
-  private String nombreEmpresa;
+  @Column(name = "COD_PRODUCTO", nullable = false)
+  private Integer codProducto;
 
-  @Column(name = "DIRECCION", length = 512)
-  private String direccion;
+  @Column(name = "COD_USUARIO", nullable = false, length = 64)
+  private String codUsuario;
 
-  @Column(name = "TELEFONO", length = 16)
-  private String telefono;
+  @Column(name = "TEXTO", nullable = false, length = 512)
+  private String texto;
 
-  @Column(name = "MAIL", length = 64)
-  private String mail;
-
-  @Column(name = "CLIENTE_ACTIVO", length = 1, nullable = false)
-  private String clienteActivo;
-
-  @Column(name = "FECHA_INGRESO", nullable = false)
+  @Column(name = "FECHA_CREACION")
   @Temporal(TemporalType.TIMESTAMP)
-  private Date fechaIngreso;
+  private Date fechaCreacion;
 }

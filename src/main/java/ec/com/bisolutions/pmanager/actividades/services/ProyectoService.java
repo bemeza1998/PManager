@@ -1,9 +1,11 @@
 package ec.com.bisolutions.pmanager.actividades.services;
 
+import ec.com.bisolutions.pmanager.actividades.dao.EmpresaRepository;
 import ec.com.bisolutions.pmanager.actividades.dao.ProyectoRepository;
 import ec.com.bisolutions.pmanager.actividades.dao.RegistroModificacionRepository;
 import ec.com.bisolutions.pmanager.actividades.enums.EstadoSolicitudModificar;
 import ec.com.bisolutions.pmanager.actividades.enums.TipoTablaEnum;
+import ec.com.bisolutions.pmanager.actividades.model.Empresa;
 import ec.com.bisolutions.pmanager.actividades.model.Proyecto;
 import ec.com.bisolutions.pmanager.actividades.model.RegistroModificacion;
 import ec.com.bisolutions.pmanager.seguridad.enums.EstadoGeneralEnum;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class ProyectoService {
 
   private final ProyectoRepository proyectoRepository;
+  private final EmpresaRepository empresaRepository;
   private final RegistroModificacionRepository registroModificacionRepository;
 
   public Proyecto crear(Proyecto proyecto) {
@@ -32,6 +35,7 @@ public class ProyectoService {
     proyecto.setEstado(EstadoGeneralEnum.ACTIVO.getValue());
     proyecto.setValorDia(valorDia);
     proyecto.setValorHora(valorHora);
+    proyecto.setEmpresa(this.buscarEmpresaPorCodigo(proyecto.getCodEmpresa()));
     return this.proyectoRepository.save(proyecto);
   }
 
@@ -61,8 +65,8 @@ public class ProyectoService {
   public List<Proyecto> obtenerPorJefatura(Integer codJefatura) {
     String[] noEliminados = {EstadoSolicitudModificar.ELIMINADO.getValue()};
     return this.proyectoRepository
-        .findByCodJefaturaAndEstadoSolicitudModificacionNotInOrderByNombre(
-            codJefatura, noEliminados);
+        .findByCodJefaturaAndEstadoSolicitudModificacionNotInAndEstadoOrderByNombre(
+            codJefatura, noEliminados, EstadoGeneralEnum.ACTIVO.getValue());
   }
 
   public List<Proyecto> obtenerPorEstadoModificacion() {
@@ -96,5 +100,11 @@ public class ProyectoService {
         .fechaModificacion(new Date())
         .comentario(proyecto.getComentarioSolicitudModificacion())
         .build();
+  }
+
+  private Empresa buscarEmpresaPorCodigo(Integer codEmpresa) {
+    return this.empresaRepository
+        .findById(codEmpresa)
+        .orElseThrow(() -> new NotFoundException("Error, la empresa no existe"));
   }
 }

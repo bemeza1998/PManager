@@ -1,5 +1,6 @@
 package ec.com.bisolutions.pmanager.actividades.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -27,9 +28,11 @@ public class ProductoDTO {
 
   private Integer mes;
 
-  private Date semana;
+  @JsonFormat(pattern = "dd-MM-yyyy")
+  private String semana;
 
-  private Date fechaEstimadaEntrega;
+  @JsonFormat(pattern = "dd-MM-yyyy")
+  private String fechaEstimadaEntrega;
 
   private Integer horasEstimadas;
 
@@ -37,9 +40,7 @@ public class ProductoDTO {
 
   private BigDecimal porcentajeCumplimiento;
 
-  private String cronograma;
-
-  private String observaciones;
+  private Boolean cronograma;
 
   private Integer entregadoQa;
 

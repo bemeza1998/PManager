@@ -5,6 +5,7 @@ import ec.com.bisolutions.pmanager.actividades.mapper.ProductoMapper;
 import ec.com.bisolutions.pmanager.actividades.model.Producto;
 import ec.com.bisolutions.pmanager.actividades.services.ProductoService;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,8 +51,9 @@ public class ProductoResource {
 
   @PreAuthorize("hasAnyRole('ADM','CAL')")
   @GetMapping(path = "/todos")
-  public ResponseEntity<List<ProductoDTO>> obtenerProductosTodos() {
-    List<Producto> productos = this.service.obtenerProductosTodos();
+  public ResponseEntity<List<ProductoDTO>> obtenerProductosTodos(
+      @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") Date semana) {
+    List<Producto> productos = this.service.obtenerProductosTodos(semana);
     List<ProductoDTO> productosDTO = new ArrayList<ProductoDTO>();
     for (Producto producto : productos) {
       productosDTO.add(ProductoMapper.buildProductoDTO(producto));
@@ -65,11 +67,13 @@ public class ProductoResource {
       @RequestParam(required = false) Integer codProyecto,
       @RequestParam(required = false) String nombreCreador,
       @RequestParam(required = false) BigDecimal porcentaje,
+      @RequestParam(required = false) Integer mes,
       @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date semana,
-      @RequestParam(required = false) String nombreProducto) {
+      @RequestParam(required = false) String nombreProducto,
+      @RequestParam(required = false) String estadoQa) {
     List<Producto> productos =
         this.service.obtenerPorFiltro(
-            codProyecto, nombreCreador, porcentaje, semana, nombreProducto);
+            codProyecto, nombreCreador, porcentaje, mes, semana, nombreProducto, estadoQa);
     List<ProductoDTO> productosDTO = new ArrayList<ProductoDTO>();
     for (Producto producto : productos) {
       productosDTO.add(ProductoMapper.buildProductoDTO(producto));
@@ -91,50 +95,102 @@ public class ProductoResource {
   @PreAuthorize("hasAnyRole('ADM','REC')")
   @PostMapping
   public ResponseEntity<ProductoDTO> crear(@RequestBody ProductoDTO dto) {
-    Producto producto = this.service.crear(ProductoMapper.buildProducto(dto));
-    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    try {
+      Producto producto = this.service.crear(ProductoMapper.buildProducto(dto));
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 
   @PreAuthorize("hasAnyRole('ADM','REC')")
   @PutMapping
   public ResponseEntity<ProductoDTO> modificar(@RequestBody ProductoDTO dto) {
-    Producto producto = this.service.modificar(ProductoMapper.buildProducto(dto));
-    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    try {
+      Producto producto = this.service.modificar(ProductoMapper.buildProducto(dto));
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 
   @PreAuthorize("hasAnyRole('ADM','CAL')")
   @PutMapping(path = "/qa")
   public ResponseEntity<ProductoDTO> modificarQA(@RequestBody ProductoDTO dto) {
-    Producto producto = this.service.modificarQA(ProductoMapper.buildProducto(dto));
-    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    try {
+      Producto producto = this.service.modificarQA(ProductoMapper.buildProducto(dto));
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 
   @PreAuthorize("hasAnyRole('ADM','REC','JEF','ALP')")
   @PatchMapping
   public ResponseEntity<ProductoDTO> solicitarEstado(@RequestBody ProductoDTO dto) {
-    Producto producto = this.service.solicitarEstado(ProductoMapper.buildProducto(dto));
-    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    try {
+      Producto producto = this.service.solicitarEstado(ProductoMapper.buildProducto(dto));
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 
   @PreAuthorize("hasAnyRole('ADM','REC')")
-  @PatchMapping(path = "/porcentaje")
-  public ResponseEntity<ProductoDTO> modificarPorcentajeCumplimiento(@RequestBody ProductoDTO dto) {
-    Producto producto =
-        this.service.modificarPorcentajeCumplimiento(ProductoMapper.buildProducto(dto));
-    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+  @PatchMapping(path = "/cronograma")
+  public ResponseEntity<ProductoDTO> modificarCronograma(@RequestBody ProductoDTO dto) {
+    try {
+      Producto producto = this.service.modificarCronograma(ProductoMapper.buildProducto(dto));
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 
-  @PreAuthorize("hasAnyRole('ADM','CAL')")
+  /*@PreAuthorize("hasAnyRole('ADM','REC')")
+  @PatchMapping(path = "/observaciones")
+  public ResponseEntity<ProductoDTO> modificarObservaciones(@RequestBody ProductoDTO dto) {
+    try {
+      Producto producto = this.service.modificarObservaciones(ProductoMapper.buildProducto(dto));
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
+  }*/
+
+  @PreAuthorize("hasAnyRole('ADM','REC','CAL')")
+  @PatchMapping(path = "/porcentaje/{codUsuario}")
+  public ResponseEntity<ProductoDTO> modificarPorcentajeCumplimiento(
+      @RequestBody ProductoDTO dto, @PathVariable String codUsuario) {
+    try {
+      Producto producto =
+          this.service.modificarPorcentajeCumplimiento(
+              ProductoMapper.buildProducto(dto), codUsuario);
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
+  }
+
+  @PreAuthorize("hasAnyRole('ADM','CAL','REC')")
   @PatchMapping(path = "/estadoqa")
   public ResponseEntity<ProductoDTO> modificarEstadoQA(@RequestBody ProductoDTO dto) {
-    Producto producto = this.service.modificarEstadoQA(ProductoMapper.buildProducto(dto));
-    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    try {
+      Producto producto = this.service.modificarEstadoQA(ProductoMapper.buildProducto(dto));
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 
   @PreAuthorize("hasAnyRole('ADM','CAL')")
   @PatchMapping(path = "/observacionqa")
   public ResponseEntity<ProductoDTO> modificarObservacionQA(@RequestBody ProductoDTO dto) {
-    Producto producto = this.service.modificarObservacionQA(ProductoMapper.buildProducto(dto));
-    return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    try {
+      Producto producto = this.service.modificarObservacionQA(ProductoMapper.buildProducto(dto));
+      return ResponseEntity.ok(ProductoMapper.buildProductoDTO(producto));
+    } catch (ParseException e) {
+      return ResponseEntity.badRequest().build();
+    }
   }
 }

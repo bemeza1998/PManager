@@ -10,6 +10,8 @@ public interface ProductoCustomRepository {
       Integer codProyecto,
       String nombreCreador,
       BigDecimal porcentaje,
+      Integer mes,
       Date semana,
-      String nombreProducto);
+      String nombreProducto,
+      String estadoQa);
 }

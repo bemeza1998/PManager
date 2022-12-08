@@ -11,6 +11,8 @@ public interface ProductoRepository
 
   List<Producto> findByUsuarioEstadoOrderByFechaCreacionDesc(String estado);
 
+  List<Producto> findByUsuarioEstadoAndSemanaOrderByFechaCreacionDesc(String estado, Date semana);
+
   List<Producto>
       findByPkCodUsuarioAndEstadoSolicitudModificacionNotInAndUsuarioEstadoOrderBySemanaDesc(
           String codUsuario, String[] estado, String estadoUsuario);

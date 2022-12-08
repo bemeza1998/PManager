@@ -43,6 +43,7 @@ public class UsuarioMapper {
     return UserAuthDTO.builder()
         .codUsuario(usuario.getPk().getCodUsuario())
         .codPerfil(usuario.getCodPerfil())
+        .codJefatura(usuario.getPk().getCodJefatura())
         .nombre(usuario.getNombre())
         .apellido(usuario.getApellido())
         .mail(usuario.getMail())

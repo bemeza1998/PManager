@@ -13,4 +13,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UsuarioPK> {
   Optional<Usuario> findByPkCodUsuario(String codUsuario);
 
   List<Usuario> findByEstadoOrderByNombre(String estado);
+
+  List<Usuario> findByCodPerfilAndEstadoOrderByNombre(String codPerfil, String estado);
 }

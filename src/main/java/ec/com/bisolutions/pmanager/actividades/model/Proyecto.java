@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -42,6 +44,9 @@ public class Proyecto implements Serializable {
 
   @Column(name = "COD_JEFATURA", nullable = false, length = 16)
   private Integer codJefatura;
+
+  @Column(name = "COD_EMPRESA", nullable = false)
+  private Integer codEmpresa;
 
   @Column(name = "NOMBRE", nullable = false, length = 64)
   private String nombre;
@@ -89,14 +94,11 @@ public class Proyecto implements Serializable {
   @Column(name = "NOMBRE_USUARIO_COMPLETO", nullable = false, length = 256)
   private String nombreUsuarioCompleto;
 
-  @Column(name = "NOMBRE_EMPRESA", length = 128)
-  private String nombreEmpresa;
-
-  /*@JoinColumn(
+  @JoinColumn(
       name = "COD_EMPRESA",
       referencedColumnName = "COD_EMPRESA",
       insertable = false,
       updatable = false)
   @ManyToOne
-  private Empresa empresa;*/
+  private Empresa empresa;
 }

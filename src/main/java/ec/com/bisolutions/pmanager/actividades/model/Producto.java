@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 public class Producto implements Serializable {
 
   private static final long serialVersionUID = 11231231L;
-  @EmbeddedId @EqualsAndHashCode.Include protected ProductoPK pk;
+  @EqualsAndHashCode.Include @EmbeddedId protected ProductoPK pk;
 
   @Column(name = "NOMBRE", nullable = false, length = 256)
   private String nombre;
@@ -64,11 +64,8 @@ public class Producto implements Serializable {
   @Column(name = "PORCENTAJE_CUMPLIMIENTO", precision = 5, scale = 2)
   private BigDecimal porcentajeCumplimiento;
 
-  @Column(name = "CRONOGRAMA", length = 64)
-  private String cronograma;
-
-  @Column(name = "OBSERVACIONES", length = 516)
-  private String observaciones;
+  @Column(name = "CRONOGRAMA")
+  private Integer cronograma;
 
   @Column(name = "ENTREGADO_QA")
   private Integer entregadoQa;

@@ -27,7 +27,7 @@ public class ProyectoMapper {
         .fechaSolicitudModificacion(dto.getFechaSolicitudModificacion())
         .comentarioSolicitudModificacion(dto.getComentarioSolicitudModificacion())
         .nombreUsuarioCompleto(dto.getNombreUsuarioCompleto())
-        .nombreEmpresa(dto.getNombreEmpresa())
+        .codEmpresa(dto.getCodEmpresa())
         .build();
   }
 
@@ -50,7 +50,8 @@ public class ProyectoMapper {
         .fechaSolicitudModificacion(proyecto.getFechaSolicitudModificacion())
         .comentarioSolicitudModificacion(proyecto.getComentarioSolicitudModificacion())
         .nombreUsuarioCompleto(proyecto.getNombreUsuarioCompleto())
-        .nombreEmpresa(proyecto.getNombreEmpresa())
+        .nombreEmpresa(proyecto.getEmpresa().getNombreEmpresa())
+        .codEmpresa(proyecto.getEmpresa().getCodEmpresa())
         .build();
   }
 }

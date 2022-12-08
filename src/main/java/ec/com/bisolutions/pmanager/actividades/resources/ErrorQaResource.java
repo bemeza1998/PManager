@@ -25,7 +25,7 @@ public class ErrorQaResource {
 
   private final ErrorQaService service;
 
-  @PreAuthorize("hasAnyRole('ADM','CAL')")
+  @PreAuthorize("hasAnyRole('ADM','CAL','REC')")
   @GetMapping(path = "/{codProducto}")
   public ResponseEntity<List<ErrorQaDTO>> obtenerErroresProducto(
       @PathVariable Integer codProducto) {

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,10 +27,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsuarioResource {
   private final UsuarioService service;
 
-  @PreAuthorize("hasRole('ADM')")
+  @PreAuthorize("hasAnyRole('ADM')")
   @GetMapping(path = "/estado/{estado}")
   public ResponseEntity<List<UsuarioDTO>> obtenerUsuarios(@PathVariable String estado) {
     List<Usuario> usuarios = this.service.obtenerUsuarios(estado);
+    List<UsuarioDTO> usuariosDTO = new ArrayList<UsuarioDTO>();
+    for (Usuario usuario : usuarios) {
+      usuariosDTO.add(UsuarioMapper.buildUserDTO(usuario));
+    }
+    return ResponseEntity.ok(usuariosDTO);
+  }
+
+  @PreAuthorize("hasAnyRole('ADM','CAL')")
+  @GetMapping(path = "/perfil/{perfil}")
+  public ResponseEntity<List<UsuarioDTO>> obtenerUsuariosPerfil(@PathVariable String perfil) {
+    List<Usuario> usuarios = this.service.obtenerUsuariosPerfil(perfil);
     List<UsuarioDTO> usuariosDTO = new ArrayList<UsuarioDTO>();
     for (Usuario usuario : usuarios) {
       usuariosDTO.add(UsuarioMapper.buildUserDTO(usuario));
@@ -72,11 +82,11 @@ public class UsuarioResource {
     return ResponseEntity.ok(userAuthDTO);
   }
 
-  @PatchMapping(path = "/clave")
-  public ResponseEntity<Usuario> cambiarClave(
-      @RequestParam String codUsuario,
-      @RequestParam String claveAntigua,
-      @RequestParam String claveNueva) {
+  @PatchMapping(path = "/cambioclave/{codUsuario}/{claveAntigua}/{claveNueva}")
+  public ResponseEntity<?> cambiarClave(
+      @PathVariable String codUsuario,
+      @PathVariable String claveAntigua,
+      @PathVariable String claveNueva) {
     this.service.cambiarClave(codUsuario, claveAntigua, claveNueva);
     return ResponseEntity.ok().build();
   }

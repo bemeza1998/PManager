@@ -20,7 +20,6 @@ import ec.com.bisolutions.pmanager.seguridad.model.Usuario;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,6 +47,11 @@ public class UsuarioService {
     } else {
       return this.usuarioRepository.findByEstadoOrderByNombre(estado);
     }
+  }
+
+  public List<Usuario> obtenerUsuariosPerfil(String perfil) {
+    return this.usuarioRepository.findByCodPerfilAndEstadoOrderByNombre(
+        perfil, EstadoUsuarioEnum.ACTIVO.getValue());
   }
 
   public Usuario crear(Usuario usuario) {
@@ -165,11 +169,11 @@ public class UsuarioService {
       throws CambioClaveException {
     Usuario usuario = this.buscarUsuarioPorCodigo(codUsuario);
 
-    claveAntigua = DigestUtils.sha256Hex(claveAntigua);
-    if (!usuario.getClave().equals(claveAntigua)) {
+    Boolean claveCorrecta = passwordEncoder.matches(claveAntigua, usuario.getClave());
+    if (!claveCorrecta) {
       throw new CambioClaveException("La clave antigua no es correcta.");
     }
-    usuario.setClave(DigestUtils.sha256Hex(claveNueva));
+    usuario.setClave(passwordEncoder.encode(claveNueva));
     usuario.setFechaCambioClave(new Date());
     this.usuarioRepository.save(usuario);
   }

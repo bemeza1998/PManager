@@ -21,6 +21,8 @@ public class ProyectoDTO {
 
   private Integer codJefatura;
 
+  private Integer codEmpresa;
+
   private String nombre;
 
   private String descripcion;

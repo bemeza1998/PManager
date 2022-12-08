@@ -15,6 +15,8 @@ public class UserAuthDTO {
 
   private String codPerfil;
 
+  private Number codJefatura;
+
   private String nombre;
 
   private String apellido;
