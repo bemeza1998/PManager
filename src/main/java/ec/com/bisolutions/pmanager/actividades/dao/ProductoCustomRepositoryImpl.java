@@ -22,6 +22,7 @@ public class ProductoCustomRepositoryImpl implements ProductoCustomRepository {
 
   @Override
   public List<Producto> buscarProductosPorFiltro(
+      String codUsuario,
       Integer codProyecto,
       String nombreCreador,
       BigDecimal porcentaje,
@@ -35,6 +36,9 @@ public class ProductoCustomRepositoryImpl implements ProductoCustomRepository {
     Root<Producto> producto = cq.from(Producto.class);
     List<Predicate> predicates = new ArrayList<>();
 
+    if (codUsuario != null && !estadoQa.isEmpty()) {
+      predicates.add(cb.equal(producto.join("usuario").get("pk").get("codUsuario"), codUsuario));
+    }
     if (codProyecto != null) {
       predicates.add(cb.equal(producto.get("codProyecto"), codProyecto));
     }

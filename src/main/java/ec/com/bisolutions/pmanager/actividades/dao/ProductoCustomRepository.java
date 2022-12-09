@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ProductoCustomRepository {
   List<Producto> buscarProductosPorFiltro(
+      String codUsuario,
       Integer codProyecto,
       String nombreCreador,
       BigDecimal porcentaje,

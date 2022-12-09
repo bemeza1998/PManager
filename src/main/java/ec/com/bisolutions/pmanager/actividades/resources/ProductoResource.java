@@ -64,6 +64,7 @@ public class ProductoResource {
   @PreAuthorize("hasAnyRole('ADM','REC','CAL')")
   @GetMapping(path = "/filtro")
   public ResponseEntity<List<ProductoDTO>> obtenerProductosPorFiltro(
+      @RequestParam(required = false) String codUsuario,
       @RequestParam(required = false) Integer codProyecto,
       @RequestParam(required = false) String nombreCreador,
       @RequestParam(required = false) BigDecimal porcentaje,
@@ -73,7 +74,14 @@ public class ProductoResource {
       @RequestParam(required = false) String estadoQa) {
     List<Producto> productos =
         this.service.obtenerPorFiltro(
-            codProyecto, nombreCreador, porcentaje, mes, semana, nombreProducto, estadoQa);
+            codUsuario,
+            codProyecto,
+            nombreCreador,
+            porcentaje,
+            mes,
+            semana,
+            nombreProducto,
+            estadoQa);
     List<ProductoDTO> productosDTO = new ArrayList<ProductoDTO>();
     for (Producto producto : productos) {
       productosDTO.add(ProductoMapper.buildProductoDTO(producto));

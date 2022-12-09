@@ -60,6 +60,7 @@ public class ProductoService {
   }
 
   public List<Producto> obtenerPorFiltro(
+      String codUsuario,
       Integer codProyecto,
       String nombreCreador,
       BigDecimal porcentaje,
@@ -68,7 +69,7 @@ public class ProductoService {
       String nombreProducto,
       String estadoQa) {
     return this.productoRepository.buscarProductosPorFiltro(
-        codProyecto, nombreCreador, porcentaje, mes, semana, nombreProducto, estadoQa);
+        codUsuario, codProyecto, nombreCreador, porcentaje, mes, semana, nombreProducto, estadoQa);
   }
 
   public Producto crear(Producto producto) {
