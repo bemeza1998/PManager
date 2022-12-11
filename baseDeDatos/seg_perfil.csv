@@ -1,0 +1,6 @@
+COD_PERFIL,NOMBRE,DESCRIPCION,ESTADO
+ADM,Administrador,Perfil de Administrador,ACT
+ALP,Analista de proyectos,Analista de proyectos,ACT
+CAL,Calidad,Calidad,ACT
+JEF,Jefatura de operaciones,Jefatura de operaciones,ACT
+REC,Recurso,Recurso,ACT
