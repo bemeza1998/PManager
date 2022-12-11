@@ -7,7 +7,7 @@ El proyecto fue realizado con Java 11 y el framework SpringBoot versión 2.7.5
 Para trabajar de una forma mas eficiente, se utilizó una arquitecuta de N-capas, en donde la primera de estas, es la capa de modelo, luego tenemos la capa DAO, seguida de la capa de servicios y por último, la capa de recursos, acontinuación, se detallas más de cada una de estas.
 Se dividio en proyecto en dos módulos principales los cuales son actividades y seguridad.
 
-## Módulo actividades
+## Módulos
 
 ### Capa model
 
